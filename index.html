@@ -157,58 +157,84 @@
             </section>
         </div>
     </div>
-    <script>
-        function createStars(id, count) {
-            let shadows = "";
-            for (let i = 0; i < count; i++) {
-                shadows += `${Math.floor(Math.random() * 2000)}px ${Math.floor(Math.random() * 2000)}px #FFF${i < count-1 ? "," : ""}`;
-            }
-            document.getElementById(id).style.boxShadow = shadows;
+   <script>
+    // 1. STAR GENERATOR
+    function createStars(id, count) {
+        let shadows = "";
+        for (let i = 0; i < count; i++) {
+            shadows += `${Math.floor(Math.random() * 2000)}px ${Math.floor(Math.random() * 2000)}px #FFF${i < count-1 ? "," : ""}`;
         }
+        document.getElementById(id).style.boxShadow = shadows;
+    }
+    createStars("stars", 700); createStars("stars2", 200); createStars("stars3", 100);
 
-        createStars("stars", 700); createStars("stars2", 200); createStars("stars3", 100);
+    // 2. AUTH LOGIC
+    let mode = 'login';
+    function checkAutoLogin() { if (localStorage.getItem('isLoggedIn') === 'true') startBootSequence(); }
 
-        function checkAutoLogin() { if (localStorage.getItem('isLoggedIn') === 'true') startBootSequence(); }
-        function switchTab(t) { mode = t; }
+    function switchTab(t) {
+        mode = t;
+        // This part fixes the "unresponsive" signup button
+        document.getElementById('loginTab').className = t === 'login' ? "font-bold border-b-2 border-[var(--accent)]" : "font-bold text-gray-400";
+        document.getElementById('signupTab').className = t === 'signup' ? "font-bold border-b-2 border-[var(--accent)]" : "font-bold text-gray-400";
+    }
 
-        function runAuth() {
-            localStorage.setItem('isLoggedIn', 'true'); // Bypass for testing, add your logic here
-            startBootSequence();
+    function runAuth() {
+        const user = document.getElementById('uName').value;
+        const pass = document.getElementById('uPass').value;
+        if (!user || pass.length < 6) return alert("Enter Username & Password (min 6 chars)");
+
+        if (mode === 'signup') {
+            localStorage.setItem('savedUser', user);
+            localStorage.setItem('savedPass', pass);
+            alert("Identity Registered. Now Login."); 
+            switchTab('login');
+        } else {
+            if (user === localStorage.getItem('savedUser') && pass === localStorage.getItem('savedPass')) {
+                localStorage.setItem('isLoggedIn', 'true');
+                startBootSequence();
+            } else { alert("Access Denied: Credentials Mismatch."); }
         }
+    }
 
-        function startBootSequence() {
-            document.getElementById('authSection').style.display = 'none';
-            document.getElementById('loaderScreen').style.display = 'flex';
-            let progress = 0;
-            const bar = document.getElementById('fill-progress');
-            const itv = setInterval(() => {
-                progress += 5;
-                bar.style.width = progress + "%";
-                if (progress >= 100) { clearInterval(itv); setTimeout(showPortal, 500); }
-            }, 50);
-        }
+    // 3. TRANSITION LOGIC
+    function startBootSequence() {
+        document.getElementById('authSection').style.display = 'none';
+        document.getElementById('loaderScreen').style.display = 'flex';
+        let progress = 0;
+        const bar = document.getElementById('fill-progress');
+        const itv = setInterval(() => {
+            progress += 5;
+            bar.style.width = progress + "%";
+            if (progress >= 100) { clearInterval(itv); setTimeout(showPortal, 500); }
+        }, 50);
+    }
 
-        function showPortal() {
-            document.getElementById('loaderScreen').style.display = 'none';
-            document.getElementById('star-container').style.display = 'block';
-            document.getElementById('gameGrid').style.display = 'block';
-            document.getElementById('extraSections').style.display = 'block';
-            document.getElementById('navMenu').style.display = 'flex';
-            loadGames();
-        }
+    function showPortal() {
+        document.getElementById('loaderScreen').style.display = 'none';
+        document.getElementById('star-container').style.display = 'block';
+        document.getElementById('gameGrid').style.display = 'block';
+        document.getElementById('extraSections').style.display = 'block';
+        document.getElementById('navMenu').style.display = 'flex';
+        loadGames();
+    }
 
-        function loadGames() {
-            const g = [{n:'One Piece', i:'LUFFY.png'}, {n:'Dragon Ball', i:'GOKU.webp'}, {n:'Doraemon', i:'DORAEMON.webp'}, {n:'Ben 10', i:'BEN 10.png'}];
-            document.getElementById('missionList').innerHTML = g.map(x => `
-                <div class="neon-border p-4 bg-black/80 backdrop-blur-sm text-center rounded-xl">
-                    <img src="${x.i}" class="h-32 mx-auto mb-4" onerror="this.src='https://placehold.co/100/39ff14'">
-                    <h3 class="retro-font text-[8px] mb-4">${x.n}</h3>
-                    <button class="bg-[var(--accent)] text-black font-bold w-full py-2 text-[10px] rounded">LAUNCH</button>
-                </div>`).join('');
-        }
+    // 4. LOAD MISSIONS (Matching your current GitHub filenames)
+    function loadGames() {
+        const g = [
+            {n:'One Piece', i:'LUFFY.png'}, 
+            {n:'Dragon Ball', i:'GOKU.webp'}, 
+            {n:'Doraemon', i:'DORAEMON.webp'}, 
+            {n:'Ben 10', i:'BEN 10.png'}
+        ];
+        document.getElementById('missionList').innerHTML = g.map(x => `
+            <div class="neon-border p-4 bg-black/80 backdrop-blur-sm text-center rounded-xl hover:scale-105 transition-all">
+                <img src="${x.i}" class="h-32 mx-auto mb-4" onerror="this.src='https://placehold.co/100/39ff14'">
+                <h3 class="retro-font text-[8px] mb-4">${x.n}</h3>
+                <button class="bg-[var(--accent)] text-black font-bold w-full py-2 text-[10px] rounded">LAUNCH</button>
+            </div>`).join('');
+    }
 
-        function logout() { localStorage.setItem('isLoggedIn', 'false'); location.reload(); }
-        function saveContactData() { document.getElementById('successNotice').classList.remove('hidden'); }
-    </script>
-</body>
+    function logout() { localStorage.setItem('isLoggedIn', 'false'); location.reload(); }
+</script>
 </html>
