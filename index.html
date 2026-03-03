@@ -157,7 +157,8 @@
             </section>
         </div>
     </div>
-   <script>
+
+<script>
     // 1. STAR GENERATOR
     function createStars(id, count) {
         let shadows = "";
@@ -174,7 +175,6 @@
 
     function switchTab(t) {
         mode = t;
-        // This part fixes the "unresponsive" signup button
         document.getElementById('loginTab').className = t === 'login' ? "font-bold border-b-2 border-[var(--accent)]" : "font-bold text-gray-400";
         document.getElementById('signupTab').className = t === 'signup' ? "font-bold border-b-2 border-[var(--accent)]" : "font-bold text-gray-400";
     }
@@ -219,22 +219,32 @@
         loadGames();
     }
 
-    // 4. LOAD MISSIONS (Matching your current GitHub filenames)
+    // 4. LOAD MISSIONS (Updated with working Launch buttons)
     function loadGames() {
-        const g = [
-            {n:'One Piece', i:'LUFFY.png'}, 
-            {n:'Dragon Ball', i:'GOKU.webp'}, 
-            {n:'Doraemon', i:'DORAEMON.webp'}, 
-            {n:'Ben 10', i:'BEN 10.png'}
+        const container = document.getElementById('missionList');
+        const games = [
+            { n: 'One Piece', i: 'LUFFY.png', url: 'https://www.miniplay.com/one-piece-games' },
+            { n: 'Dragon Ball', i: 'GOKU.webp', url: 'https://www.dbzgames.org' },
+            { n: 'Doraemon', i: 'DORAEMON.webp', url: 'https://www.play-games.com/doraemon-games.html' },
+            { n: 'Ben 10', i: 'BEN 10.png', url: 'https://ben10gamesfree.com' }
         ];
-        document.getElementById('missionList').innerHTML = g.map(x => `
+
+        container.innerHTML = games.map(x => `
             <div class="neon-border p-4 bg-black/80 backdrop-blur-sm text-center rounded-xl hover:scale-105 transition-all">
                 <img src="${x.i}" class="h-32 mx-auto mb-4" onerror="this.src='https://placehold.co/100/39ff14'">
                 <h3 class="retro-font text-[8px] mb-4">${x.n}</h3>
-                <button class="bg-[var(--accent)] text-black font-bold w-full py-2 text-[10px] rounded">LAUNCH</button>
+                <button onclick="window.open('${x.url}', '_blank')" class="bg-[var(--accent)] text-black font-bold w-full py-2 text-[10px] rounded hover:bg-white transition-colors">
+                    LAUNCH
+                </button>
             </div>`).join('');
     }
 
     function logout() { localStorage.setItem('isLoggedIn', 'false'); location.reload(); }
+
+    function saveContactData() { 
+        document.getElementById('successNotice').classList.remove('hidden'); 
+        setTimeout(() => { document.getElementById('successNotice').classList.add('hidden'); }, 3000);
+    }
 </script>
+</body>
 </html>
